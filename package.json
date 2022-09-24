@@ -1,20 +1,32 @@
 {
   "name": "TorrentFileRenamer",
   "version": "1.0.0",
-  "license": "MIT",
-  "main": "build/index.js",
   "keywords": [],
   "repository": {
     "type": "git",
     "url": "https://github.com/RyanMKrol/TorrentFileRenamer.git"
   },
+  "license": "MIT",
+  "main": "build/index.js",
   "files": [
     "build"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npm run lint && shx rm -rf build && ./node_modules/.bin/babel src --out-dir build",
-    "lint": "eslint src/ --ext .js"
+    "lint": "eslint src/ --ext .js",
+    "start": "npm run-script build && node build/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "./scripts/husky"
+    }
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.12",
+    "core-js": "^3.25.2",
+    "curl": "^0.1.4",
+    "shelljs": "^0.8.5"
   },
   "devDependencies": {
     "@babel/cli": "^7.10.4",
@@ -27,11 +39,5 @@
     "husky": "^4.2.5",
     "jsdoc": "^3.6.5",
     "shx": "^0.3.2"
-  },
-  "dependencies": {},
-  "husky": {
-    "hooks": {
-      "pre-commit": "./scripts/husky"
-    }
   }
 }
