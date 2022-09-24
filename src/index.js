@@ -40,6 +40,9 @@ async function main() {
 
   const findIndexFilesRegex = new RegExp(TARGET_FILE_NAME, 'g');
 
+  console.log('running');
+  console.log(process.cwd());
+
   const tvShowInputData = findWithFilter('./', findIndexFilesRegex).reduce((acc, path) => {
     const rootPath = getRootPathItem(path);
     const showName = getLastPathItem(rootPath);

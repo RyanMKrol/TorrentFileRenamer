@@ -17,6 +17,7 @@ function getRootPathItem(path) {
  * @returns {string} Resource name
  */
 function getLastPathItem(path) {
+  console.log(path);
   return path.match(/.*\/(.*)/)[1];
 }
 
