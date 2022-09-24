@@ -17,8 +17,7 @@
   "scripts": {
     "build": "npm run lint && shx rm -rf build && ./node_modules/.bin/babel src --out-dir build",
     "lint": "eslint src/ --ext .js",
-    "start": "npm run-script build && node build/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "npm run-script build && node build/index.js"
   },
   "husky": {
     "hooks": {
