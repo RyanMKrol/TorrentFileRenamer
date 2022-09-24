@@ -1,3 +1,5 @@
+/* eslint-disable max-len */
+
 import { mv } from 'shelljs';
 import {
   getRootPathItem,
@@ -80,12 +82,10 @@ function getEpisodePathsWithEpisodeNames(input) {
     const seasonPaths = findDirectoriesAtPath(blob.tvShowRootPath).sort();
     const seasonEpisodePaths = seasonPaths.map(findVideoPaths);
 
-    return seasonEpisodePaths
-      .map((epsForSeason, seasonIndex) => epsForSeason.map((episodePath, episodeIndex) => ({
-        path: episodePath,
-        name: blob.episodeNames[`${seasonIndex + 1}`][episodeIndex],
-      })))
-      .flat(1);
+    return seasonEpisodePaths.map((epsForSeason, seasonIndex) => epsForSeason.map((episodePath, episodeIndex) => ({
+      path: episodePath,
+      name: blob.episodeNames[`${seasonIndex + 1}`][episodeIndex],
+    })));
   });
 }
 
@@ -114,7 +114,6 @@ function renameEpisodes(input) {
  * @param {object} input Blob of input data passed through program
  */
 function renameSeasons(input) {
-  // eslint-disable-next-line max-len
   const seasonPathsArray = Object.values(input).map((path) => findDirectoriesAtPath(path.tvShowRootPath));
   seasonPathsArray.forEach((seasonPaths) => {
     seasonPaths.forEach((seasonPath, i) => {

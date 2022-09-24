@@ -40,7 +40,7 @@ async function main() {
 
   const findIndexFilesRegex = new RegExp(TARGET_FILE_NAME, 'g');
 
-  const tvShowInputData = findWithFilter('.', findIndexFilesRegex).reduce((acc, path) => {
+  const tvShowInputData = findWithFilter('./', findIndexFilesRegex).reduce((acc, path) => {
     const rootPath = getRootPathItem(path);
     const showName = getLastPathItem(rootPath);
     const imdbId = JSON.parse(fs.readFileSync(path, 'utf8')).id;
@@ -65,7 +65,7 @@ async function main() {
 
   const pathsWithEpisodeNames = getEpisodePathsWithEpisodeNames(tvShowInputDataWithEpisodeNames);
 
-  renameEpisodes(pathsWithEpisodeNames);
+  renameEpisodes(pathsWithEpisodeNames.flat(1));
 }
 
 main();
