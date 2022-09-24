@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-
-import { find, mv } from 'shelljs';
+/* eslint-disable */
+import { find, mv, ls } from 'shelljs';
 import fs from 'fs';
 
-import { getSeriesLink, getEpisodeNames } from './imdb';
+import { getSeriesLink, getEpisodeNames } from './utils/imdb';
 
 const TARGET_FILE_NAME = 'index.json';
 
@@ -33,49 +33,84 @@ async function main() {
 
   const findIndexFilesRegex = new RegExp(TARGET_FILE_NAME, 'g');
 
-  const paths = findWithFilter('.', findIndexFilesRegex);
+  const tvShowPaths = findWithFilter('.', findIndexFilesRegex).reduce((acc, path) => {
+    const rootPath = getRootPathItem(path);
+    const showName = getLastPathItem(rootPath);
 
-  const dataWithSeasonPaths = paths.map((path) => ({
-    path,
-    imdbId: JSON.parse(fs.readFileSync(path, 'utf8')).id,
-    seasonPaths: findSeasonPaths(path).sort(),
-  }));
-
-  const dataWithEpisodePaths = dataWithSeasonPaths.map((item) => {
-    const seasonEpisodePaths = item.seasonPaths.map((path) => findWithFilter(path, /.*Episode.*/));
     return {
-      ...item,
-      seasonEpisodePaths,
+      ...acc,
+      [showName]: {
+        path: rootPath,
+      },
     };
-  });
+  }, {});
 
-  const dataWithEpisodeNames = await Promise.all(
-    dataWithEpisodePaths.map(async (item) => {
-      const seasonEpisodeNames = await Promise.all(
-        item.seasonPaths
-          .map((_, index) => getSeriesLink(index + 1, item.imdbId))
-          .map(async (link) => getEpisodeNames(link)),
-      );
+  const renameSeasons = () => {
+    Object.values(tvShowPaths).forEach((item) => {
+      const seasonPaths = findSeasonPaths(item.path);
+      seasonPaths.forEach((seasonPath, i) => {
+        const root = getRootPathItem(seasonPath);
+        const newPath = `${root}/Season ${i + 1}`;
 
-      return {
-        ...item,
-        seasonEpisodeNames,
-      };
-    }),
-  );
-
-  dataWithEpisodeNames.forEach((item) => {
-    item.seasonEpisodePaths.forEach((episodePaths, seasonIndex) => {
-      episodePaths.forEach((episodePath, episodeIndex) => {
-        const pathRoot = episodePath.match(/.*\//)[0];
-        const fileExtension = episodePath.match(/.*\.(.*)/)[1];
-        const newEpisodeName = item.seasonEpisodeNames[seasonIndex][episodeIndex];
-        const path = `${pathRoot}Episode ${episodeIndex + 1} - ${newEpisodeName}.${fileExtension}`;
-
-        mv(episodePath, path);
+        mv(seasonPath, newPath);
       });
     });
-  });
+  };
+
+  renameSeasons();
+  //
+  // console.log(tvShowPaths);
+  // console.log(seasonPaths);
+
+  // const dataWithSeasonPaths = paths.map((path) => ({
+  //   path,
+  //   imdbId: JSON.parse(fs.readFileSync(path, 'utf8')).id,
+  //   seasonPaths: findSeasonPaths(path).sort(),
+  // }));
+  //
+  // const dataWithEpisodePaths = dataWithSeasonPaths.map((item) => {
+  //   const seasonEpisodePaths = item.seasonPaths.map((path) => findWithFilter(path, /.*Episode.*/));
+  //   return {
+  //     ...item,
+  //     seasonEpisodePaths,
+  //   };
+  // });
+  //
+  // const dataWithEpisodeNames = await Promise.all(
+  //   dataWithEpisodePaths.map(async (item) => {
+  //     const seasonEpisodeNames = await Promise.all(
+  //       item.seasonPaths
+  //         .map((_, index) => getSeriesLink(index + 1, item.imdbId))
+  //         .map(async (link) => getEpisodeNames(link)),
+  //     );
+  //
+  //     return {
+  //       ...item,
+  //       seasonEpisodeNames,
+  //     };
+  //   }),
+  // );
+  //
+  // dataWithEpisodeNames.forEach((item) => {
+  //   item.seasonEpisodePaths.forEach((episodePaths, seasonIndex) => {
+  //     episodePaths.forEach((episodePath, episodeIndex) => {
+  //       const pathRoot = episodePath.match(/.*\//)[0];
+  //       const fileExtension = episodePath.match(/.*\.(.*)/)[1];
+  //       const newEpisodeName = item.seasonEpisodeNames[seasonIndex][episodeIndex];
+  //       const path = `${pathRoot}Episode ${episodeIndex + 1} - ${newEpisodeName}.${fileExtension}`;
+  //
+  //       mv(episodePath, path);
+  //     });
+  //   });
+  // });
+}
+
+function getRootPathItem(path) {
+  return path.match(/(.*)\/(.*)/)[1];
+}
+
+function getLastPathItem(path) {
+  return path.match(/.*\/(.*)/)[1];
 }
 
 /**
@@ -84,13 +119,9 @@ async function main() {
  * @param {string} indexPath The path to the index file we're processing
  * @returns {Array<string>} Paths to each season directory
  */
-function findSeasonPaths(indexPath) {
-  const indexDirectory = indexPath.split(TARGET_FILE_NAME)[0];
-
-  // matches paths ending in Season x, or Season (x)
-  const seasonPaths = findWithFilter(indexDirectory, /Season (\d+|\(\d+\))$/);
-
-  return seasonPaths;
+function findSeasonPaths(path) {
+  // grab only the directories from the index path, then remove the ending /
+  return ls('-d', `${path}/*/`).map((item) => getRootPathItem(item));
 }
 
 /**
