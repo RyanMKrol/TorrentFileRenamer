@@ -40,17 +40,10 @@ async function main() {
 
   const findIndexFilesRegex = new RegExp(TARGET_FILE_NAME, 'g');
 
-  console.log('running');
-  console.log(process.cwd());
-
-  const tvShowInputData = findWithFilter('./', findIndexFilesRegex).reduce((acc, path) => {
-    console.log(path);
+  const tvShowInputData = findWithFilter('.', findIndexFilesRegex).reduce((acc, path) => {
     const rootPath = getRootPathItem(path);
-    console.log(rootPath);
     const showName = getLastPathItem(rootPath);
-    console.log(showName);
     const imdbId = JSON.parse(fs.readFileSync(path, 'utf8')).id;
-    console.log(imdbId);
 
     return {
       ...acc,
