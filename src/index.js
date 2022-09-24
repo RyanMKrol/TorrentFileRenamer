@@ -5,7 +5,7 @@ import fs from 'fs';
 
 import { getSeriesLink, getEpisodeNames } from './imdb';
 
-const targetFileName = 'index.json';
+const TARGET_FILE_NAME = 'index.json';
 
 /**
  * Main
@@ -31,7 +31,7 @@ async function main() {
         index.json
   */
 
-  const findIndexFilesRegex = new RegExp(targetFileName, 'g');
+  const findIndexFilesRegex = new RegExp(TARGET_FILE_NAME, 'g');
 
   const paths = findWithFilter('.', findIndexFilesRegex);
 
@@ -68,9 +68,11 @@ async function main() {
     item.seasonEpisodePaths.forEach((episodePaths, seasonIndex) => {
       episodePaths.forEach((episodePath, episodeIndex) => {
         const pathRoot = episodePath.match(/.*\//)[0];
+        const fileExtension = episodePath.match(/.*\.(.*)/)[1];
         const newEpisodeName = item.seasonEpisodeNames[seasonIndex][episodeIndex];
-        const newEpisodePath = `${pathRoot}Episode ${episodeIndex + 1} - ${newEpisodeName}`;
-        mv(episodePath, newEpisodePath);
+        const path = `${pathRoot}Episode ${episodeIndex + 1} - ${newEpisodeName}.${fileExtension}`;
+
+        mv(episodePath, path);
       });
     });
   });
@@ -83,7 +85,7 @@ async function main() {
  * @returns {Array<string>} Paths to each season directory
  */
 function findSeasonPaths(indexPath) {
-  const indexDirectory = indexPath.split(targetFileName)[0];
+  const indexDirectory = indexPath.split(TARGET_FILE_NAME)[0];
 
   // matches paths ending in Season x, or Season (x)
   const seasonPaths = findWithFilter(indexDirectory, /Season (\d+|\(\d+\))$/);
