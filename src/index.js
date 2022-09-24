@@ -44,9 +44,13 @@ async function main() {
   console.log(process.cwd());
 
   const tvShowInputData = findWithFilter('./', findIndexFilesRegex).reduce((acc, path) => {
+    console.log(path);
     const rootPath = getRootPathItem(path);
+    console.log(rootPath);
     const showName = getLastPathItem(rootPath);
+    console.log(showName);
     const imdbId = JSON.parse(fs.readFileSync(path, 'utf8')).id;
+    console.log(imdbId);
 
     return {
       ...acc,
