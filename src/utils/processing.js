@@ -1,6 +1,8 @@
 /* eslint-disable max-len */
+/* eslint-disable no-await-in-loop */
 
 import { mv } from 'shelljs';
+import inquirer from 'inquirer';
 import {
   getRootPathItem,
   getPathExtension,
@@ -113,16 +115,38 @@ function renameEpisodes(input) {
  *
  * @param {object} input Blob of input data passed through program
  */
-function renameSeasons(input) {
+async function renameSeasons(input) {
   const seasonPathsArray = Object.values(input).map((path) => findDirectoriesAtPath(path.tvShowRootPath));
-  seasonPathsArray.forEach((seasonPaths) => {
-    seasonPaths.forEach((seasonPath, i) => {
-      const root = getRootPathItem(seasonPath);
-      const newPath = `${root}/Season ${i + 1}`;
 
-      mv(seasonPath, newPath);
-    });
-  });
+  for (let i = 0; i < seasonPathsArray.length; i += 1) {
+    for (let j = 0; j < seasonPathsArray[i].length; j += 1) {
+      const seasonPath = seasonPathsArray[i][j];
+      const root = getRootPathItem(seasonPath);
+      const newPath = `${root}/Season ${j + 1}`;
+
+      if (seasonPath === newPath) {
+        console.log('Old path would the same as the new path, skipping - ', seasonPath);
+      } else {
+        console.log('This is the suggested renaming:');
+        console.log(seasonPath);
+        console.log(newPath);
+
+        await inquirer
+          .prompt([
+            {
+              name: 'confirmation',
+              type: 'confirm',
+              message: 'Sound good?',
+            },
+          ])
+          .then((answer) => {
+            if (answer.confirmation) {
+              mv(seasonPath, newPath);
+            }
+          });
+      }
+    }
+  }
 }
 
 export {
