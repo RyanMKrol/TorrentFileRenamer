@@ -1,5 +1,5 @@
 {
-  "name": "TorrentFileRenamer",
+  "name": "torrent-file-renamer",
   "version": "1.0.0",
   "keywords": [],
   "repository": {
@@ -11,6 +11,9 @@
   "files": [
     "build"
   ],
+  "bin": {
+    "torrent-file-renamer": "./build/index.js"
+  },
   "scripts": {
     "build": "npm run lint && shx rm -rf build && ./node_modules/.bin/babel src --out-dir build",
     "lint": "eslint src/ --ext .js",
