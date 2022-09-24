@@ -8,12 +8,12 @@
   },
   "license": "MIT",
   "main": "build/index.js",
-  "files": [
-    "build"
-  ],
   "bin": {
     "torrent-file-renamer": "./build/index.js"
   },
+  "files": [
+    "build"
+  ],
   "scripts": {
     "build": "npm run lint && shx rm -rf build && ./node_modules/.bin/babel src --out-dir build",
     "lint": "eslint src/ --ext .js",
