@@ -82,7 +82,7 @@ async function addEpisodeNamesToInput(input) {
 function getEpisodePathsWithEpisodeNames(input) {
   return Object.values(input).map((blob) => {
     const seasonPaths = findDirectoriesAtPath(blob.tvShowRootPath).sort();
-    const seasonEpisodePaths = seasonPaths.map(findVideoPaths);
+    const seasonEpisodePaths = seasonPaths.map(findVideoPaths).map((array) => array.sort());
 
     return seasonEpisodePaths.map((epsForSeason, seasonIndex) => epsForSeason.map((episodePath, episodeIndex) => ({
       path: episodePath,
@@ -98,16 +98,38 @@ function getEpisodePathsWithEpisodeNames(input) {
  * @param {Array<Array<object>>} input An array of seasons which are an array of objects
  * each with the path to the episode, and the name of that episode
  */
-function renameEpisodes(input) {
-  input.forEach((seasonArray) => {
-    seasonArray.forEach((episodeItem, i) => {
+async function renameEpisodes(input) {
+  for (let i = 0; i < input.length; i += 1) {
+    for (let j = 0; j < input[i].length; j += 1) {
+      const episodeItem = input[i][j];
+
       const episodeRoot = getRootPathItem(episodeItem.path);
       const extension = getPathExtension(episodeItem.path);
-      const newNamePath = `${episodeRoot}/Episode ${i + 1} - ${episodeItem.name}.${extension}`;
+      const newNamePath = `${episodeRoot}/Episode ${j + 1} - ${episodeItem.name}.${extension}`;
 
-      mv(episodeItem.path, newNamePath);
-    });
-  });
+      if (episodeItem.path === newNamePath) {
+        console.log('Old path would the same as the new path, skipping - ', episodeItem.path);
+      } else {
+        console.log('This is the suggested renaming:');
+        console.log(episodeItem.path);
+        console.log(newNamePath);
+
+        await inquirer
+          .prompt([
+            {
+              name: 'confirmation',
+              type: 'confirm',
+              message: 'Sound good?',
+            },
+          ])
+          .then((answer) => {
+            if (answer.confirmation) {
+              mv(episodeItem.path, newNamePath);
+            }
+          });
+      }
+    }
+  }
 }
 
 /**
