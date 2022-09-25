@@ -55,7 +55,8 @@ async function main() {
     };
   }, {});
 
-  renameSeasons(tvShowInputData);
+  console.log('Starting to rename seasons...');
+  await renameSeasons(tvShowInputData);
 
   const tvShowInputDataWithSeasonNumbers = await addNumberOfSeasonsToInput(tvShowInputData);
 
@@ -65,7 +66,8 @@ async function main() {
 
   const pathsWithEpisodeNames = getEpisodePathsWithEpisodeNames(tvShowInputDataWithEpisodeNames);
 
-  renameEpisodes(pathsWithEpisodeNames.flat(1));
+  console.log('Starting to rename episodes...');
+  await renameEpisodes(pathsWithEpisodeNames.flat(1));
 }
 
 main();
