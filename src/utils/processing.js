@@ -105,7 +105,9 @@ async function renameEpisodes(input) {
 
       const episodeRoot = getRootPathItem(episodeItem.path);
       const extension = getPathExtension(episodeItem.path);
-      const newNamePath = `${episodeRoot}/Episode ${j + 1} - ${episodeItem.name}.${extension}`;
+      const newNamePath = `${episodeRoot}/Episode ${String(j + 1).padStart(2, '0')} - ${
+        episodeItem.name
+      }.${extension}`;
 
       if (episodeItem.path === newNamePath) {
         console.log('Old path would the same as the new path, skipping - ', episodeItem.path);
