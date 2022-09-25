@@ -146,7 +146,7 @@ async function renameSeasons(input) {
     for (let j = 0; j < seasonPathsArray[i].length; j += 1) {
       const seasonPath = seasonPathsArray[i][j];
       const root = getRootPathItem(seasonPath);
-      const newPath = `${root}/Season ${j + 1}`;
+      const newPath = `${root}/Season ${String(j + 1).padStart(2, '0')}`;
 
       if (seasonPath === newPath) {
         console.log('Old path would the same as the new path, skipping - ', seasonPath);
